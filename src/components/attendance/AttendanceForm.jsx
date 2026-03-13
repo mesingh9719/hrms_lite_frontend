@@ -27,10 +27,9 @@ export default function AttendanceForm({ employees, selectedEmployeeId, onSubmit
         return !value ? 'Please select an employee' : '';
       case 'date':
         if (!value) return 'Date is required';
-        const selectedDate = new Date(value);
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        if (selectedDate > today) return 'Cannot mark future attendance';
+        // Compare date strings directly to avoid timezone issues
+        const todayStr = new Date().toISOString().split('T')[0];
+        if (value > todayStr) return 'Cannot mark future attendance';
         return '';
       default:
         return '';

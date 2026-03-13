@@ -87,8 +87,23 @@ export default function EmployeeForm({ onSubmit, loading }) {
       setForm(INITIAL_FORM);
       setErrors(INITIAL_ERRORS);
       setTouched({});
-    } catch {
-      // Keep entered values when submission fails
+    } catch (err) {
+      // Handle server-side validation errors
+      if (err.fields) {
+        const serverErrors = {};
+        Object.entries(err.fields).forEach(([field, message]) => {
+          if (field in INITIAL_FORM) {
+            serverErrors[field] = message;
+          }
+        });
+        if (Object.keys(serverErrors).length > 0) {
+          setErrors((prev) => ({ ...prev, ...serverErrors }));
+          setTouched((prev) => ({
+            ...prev,
+            ...Object.keys(serverErrors).reduce((acc, key) => ({ ...acc, [key]: true }), {}),
+          }));
+        }
+      }
     }
   }
 
